@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
@@ -30,18 +30,22 @@ jobs:
         run: dotnet tool restore
 
       - name: Restore .NET dependencies
-        run: dotnet restore src/MoSenSoWebsite.fsproj
+        run: |
+          cd src
+          dotnet restore MoSenSoWebsite.fsproj
 
       - name: Build F# frontend
-        run: dotnet fable src/MoSenSoWebsite.fsproj --outDir dist --noCache --noRestore
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+        run: |
+          cd src
+          dotnet fable MoSenSoWebsite.fsproj --outDir ../dist --noCache --noRestore
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
   deploy:
     needs: build
