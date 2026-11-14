@@ -1,0 +1,51 @@
+name: Deploy Fresh MoSenSo Site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install Fable tool globally
+        run: dotnet tool install -g dotnet-fable || dotnet tool update -g dotnet-fable
+
+      - name: Build F# to JS
+        run: |
+          cd src
+          dotnet restore MoSenSoWebsite.fsproj
+          dotnet fable MoSenSoWebsite.fsproj --outDir ../dist --noCache
+
+      - name: Upload Artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
