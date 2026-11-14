@@ -1,4 +1,4 @@
-name: Deploy Fresh MoSenSo Site
+name: Deploy MoSenSo Site
 
 on:
   push:
@@ -11,39 +11,23 @@ permissions:
   id-token: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-
-      - name: Build F# to JS
-        run: |
-          cd src
-          dotnet restore MoSenSoWebsite.fsproj
-          dotnet tool restore || true
-          dotnet fable MoSenSoWebsite.fsproj --outDir ../dist --noCache
-
-      - name: Upload Artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
