@@ -27,7 +27,6 @@ jobs:
           cd src
           dotnet restore MoSenSoWebsite.fsproj
           dotnet tool restore || true
-          dotnet run --project MoSenSoWebsite.fsproj --no-build || true
           dotnet fable MoSenSoWebsite.fsproj --outDir ../dist --noCache
 
       - name: Upload Artifact for GitHub Pages
