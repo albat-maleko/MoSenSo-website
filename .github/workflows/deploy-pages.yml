@@ -29,8 +29,11 @@ jobs:
       - name: Restore Fable tool
         run: dotnet tool restore
 
+      - name: Restore .NET dependencies
+        run: dotnet restore src/MoSenSoWebsite.fsproj
+
       - name: Build F# frontend
-        run: dotnet fable src/MoSenSoWebsite.fsproj --outDir dist --noCache
+        run: dotnet fable src/MoSenSoWebsite.fsproj --outDir dist --noCache --noRestore
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
